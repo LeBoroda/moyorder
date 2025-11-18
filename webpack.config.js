@@ -1,5 +1,3 @@
-/* eslint-env node */
-
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import path from "path";
 import Dotenv from "dotenv-webpack";
