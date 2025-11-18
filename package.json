@@ -14,8 +14,7 @@
     "*.{css,md,yml,html}": "prettier --write --ignore-unknown",
     "*.{js,ts,jsx,tsx}": [
       "eslint --fix",
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "devDependencies": {
