@@ -2,9 +2,10 @@
   "name": "moyorder",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.ts",
+  "main": "src/main.tsx",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b  && npx webpack --mode=production",
+    "dev": "npx webpack serve --mode=development",
     "test": "jest",
     "lint": "eslint . && npx prettier . --check",
     "lint:fix": "eslint . --fix && npx prettier . --write",
@@ -38,7 +39,9 @@
     "lint-staged": "^16.2.6",
     "prettier": "3.6.2",
     "typescript": "^5.5.3",
-    "typescript-eslint": "^8.47.0"
+    "typescript-eslint": "^8.47.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
   },
   "private": true,
   "keywords": [],
