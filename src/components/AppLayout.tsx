@@ -53,6 +53,11 @@ export default function AppLayout() {
       <main className="app-main">
         <Outlet />
       </main>
+      <footer className="app-footer">
+        <a href="https://www.flaticon.com/free-icons/beer" title="beer icons">
+          Beer icons created by Dreamcreateicons - Flaticon
+        </a>
+      </footer>
     </div>
   );
 }
