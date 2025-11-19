@@ -2,11 +2,11 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 import path from "path";
 import Dotenv from "dotenv-webpack";
 
-module.exports = {
+export default {
   entry: "./src/main.tsx",
   output: {
     filename: "main.js",
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(process.cwd(), "dist"),
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
@@ -32,7 +32,7 @@ module.exports = {
   ],
   devServer: {
     static: {
-      directory: path.join(__dirname, "public"),
+      directory: path.join(process.cwd(), "public"),
     },
     compress: true,
     port: 9000,
