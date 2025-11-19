@@ -3,9 +3,9 @@ import { useAuth } from "../context/AuthContext";
 import React from "react";
 
 const NAV_ITEMS = [
-  { to: "/stock", label: "Available stock" },
-  { to: "/history", label: "Previous orders" },
-  { to: "/about", label: "About" },
+  { to: "/stock", label: "Доступные товары" },
+  { to: "/history", label: "Предыдущие заказы" },
+  { to: "/about", label: "О приложении" },
 ];
 
 export default function AppLayout() {
@@ -15,8 +15,8 @@ export default function AppLayout() {
     <div className="app-shell">
       <header className="app-header">
         <div>
-          <h1>MS Order Maker</h1>
-          <p className="app-subtitle">Fast orders on top of MoySklad</p>
+          <h1>MoySklad Order Maker</h1>
+          <p className="app-subtitle">Создание заказов в сервисе МойСклад</p>
         </div>
         <div className="user-panel" data-testid="user-panel">
           {user ? (
@@ -25,15 +25,17 @@ export default function AppLayout() {
                 <p className="user-name">{user.email}</p>
                 <p className="user-email">
                   Price list:{" "}
-                  {user.priceLevel === "basic" ? "Basic (opt)" : "Level 1"}
+                  {user.priceLevel === "basic"
+                    ? "Базовый прайс"
+                    : "Скидочный прайс"}
                 </p>
               </div>
               <button type="button" onClick={logout}>
-                Sign out
+                Выход
               </button>
             </>
           ) : (
-            <p className="user-name">Please sign in</p>
+            <p className="user-name">Пожалуйста, авторизуйтесь</p>
           )}
         </div>
       </header>
