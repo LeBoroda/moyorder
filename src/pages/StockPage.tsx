@@ -103,16 +103,16 @@ export default function StockPage() {
   return (
     <section className="page stock-page">
       <header>
-        <h2>Available stock</h2>
-        <p>Fill in the quantities you need and send the order to sales.</p>
+        <h2>Доступно к заказу</h2>
+        <p>Выберете необходимое количество для заказа.</p>
         <p className="hint">
-          Showing{" "}
-          {priceLevel === "basic" ? "basic price list" : "price level 1"} for{" "}
+          Уровень цен{" "}
+          {priceLevel === "basic" ? "базовый прайс" : "скидочный прайс"} для{" "}
           {user?.email}.
         </p>
       </header>
 
-      {loading && <p>Loading stock...</p>}
+      {loading && <p>Загружаю остатки...</p>}
       {error && (
         <p role="alert" className="form-error">
           {error}
@@ -153,7 +153,7 @@ export default function StockPage() {
           </div>
 
           <label>
-            Comment for sales (optional)
+            Комментарий к заказу (необязательно)
             <textarea
               value={comment}
               onChange={(event) => setComment(event.target.value)}
@@ -163,10 +163,10 @@ export default function StockPage() {
 
           <div className="order-summary">
             <p>
-              Total units: <strong>{totalPositions.units}</strong>
+              Итого количество: <strong>{totalPositions.units}</strong>
             </p>
             <p>
-              Order value:{" "}
+              Сумма заказа:{" "}
               <strong>{totalPositions.value.toLocaleString("ru-RU")} ₽</strong>
             </p>
           </div>
