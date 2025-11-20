@@ -1,7 +1,7 @@
 import React from "react";
-import type { UserProfile } from "../types/auth";
-import { authModel } from "../models/authModel";
 import { authController } from "../controllers/authController";
+import { authModel } from "../models/authModel";
+import type { UserProfile } from "../types/auth";
 import {
   createContext,
   ReactNode,
