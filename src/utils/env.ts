@@ -6,18 +6,6 @@ type EnvKey =
   | "EMAILJS_SERVICE_ID"
   | "EMAILJS_TEMPLATE_ID";
 
-function readViteEnv(): Record<string, string> | undefined {
-  try {
-    return (0, eval)("import.meta?.env") as Record<string, string> | undefined;
-  } catch {
-    return undefined;
-  }
-}
-
 export function readEnv(key: EnvKey): string | undefined {
-  const viteEnv = readViteEnv();
-  if (viteEnv?.[key]) {
-    return viteEnv[key];
-  }
-  return undefined;
+  return process.env[key];
 }
