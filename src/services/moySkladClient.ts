@@ -71,10 +71,7 @@ const MOYSKLAD_API_BASE =
 function ensureMoySkladToken() {
   const token = readEnv("MOYSKLAD_TOKEN");
   if (!token) {
-    const errorMsg =
-      "Missing MoySklad API token. " +
-      "Please set VITE_MOYSKLAD_TOKEN in your .env file " +
-      "and restart the development server (npm run dev).";
+    const errorMsg = "Missing MoySklad API token.";
     console.error(errorMsg);
     throw new Error(errorMsg);
   }

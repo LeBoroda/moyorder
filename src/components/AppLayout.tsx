@@ -24,7 +24,7 @@ export default function AppLayout() {
               <div>
                 <p className="user-name">{user.email}</p>
                 <p className="user-email">
-                  Price list:{" "}
+                  Уровень цен:{" "}
                   {user.priceLevel === "basic"
                     ? "Базовый прайс"
                     : "Скидочный прайс"}
