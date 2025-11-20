@@ -68,44 +68,39 @@ const MOYSKLAD_API_BASE =
     ? "/api/moysklad"
     : MOYSKLAD_API_BASE_ACTUAL;
 
-function ensureMoySkladToken() {
-  const token = readEnv("MOYSKLAD_TOKEN");
-  if (!token) {
-    const errorMsg = "Missing MoySklad API token.";
+function ensureMoySkladCredentials(): { username: string; password: string } {
+  const username = readEnv("MOYSKLAD_USERNAME") || "";
+  const password = readEnv("MOYSKLAD_PASSWORD");
+
+  if (!password) {
+    const errorMsg =
+      "Missing MoySklad credentials. Please set MOYSKLAD_PASSWORD in environment variables.";
     console.error(errorMsg);
     throw new Error(errorMsg);
   }
-  return token;
-}
 
-export function buildMoySkladAuthHeader() {
-  const token = ensureMoySkladToken();
-  // MoySklad API uses Basic Auth with empty username and token as password
-  const basicAuth = btoa(`:${token}`);
-  return { Authorization: `Basic ${basicAuth}` };
+  return { username, password };
 }
 
 async function moySkladRequest<T>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const token = ensureMoySkladToken();
+  const { username, password } = ensureMoySkladCredentials();
   const url = `${MOYSKLAD_API_BASE}${endpoint}`;
 
-  // Username not used from config now
-  const username = "";
-
-  // MoySklad API uses Basic Auth: username:token or :token (empty username)
-  const basicAuth = username ? btoa(`${username}:${token}`) : btoa(`:${token}`);
+  const basicAuth = username
+    ? btoa(`${username}:${password}`)
+    : btoa(`:${password}`);
 
   if (process.env.NODE_ENV === "development") {
     console.log(`[DEBUG] Making request to: ${url} (via proxy)`);
     console.log(`[DEBUG] Using Basic auth authentication`);
     console.log(
-      `[DEBUG] Username: ${username || "(empty)"}, Token: ${token.substring(0, 8)}...${token.substring(token.length - 4)}`,
+      `[DEBUG] Username: ${username || "(empty)"}, Password: ${password.substring(0, 8)}...${password.substring(password.length - 4)}`,
     );
     console.log(
-      `[DEBUG] Basic Auth string: ${username ? `${username}:${token.substring(0, 8)}...` : `:${token.substring(0, 8)}...`}`,
+      `[DEBUG] Basic Auth string: ${username ? `${username}:${password.substring(0, 8)}...` : `:${password.substring(0, 8)}...`}`,
     );
   }
 
@@ -284,7 +279,7 @@ async function fetchAllPages<T>(endpoint: string, limit = 1000): Promise<T[]> {
 export async function fetchAvailableStock(
   priceLevel: PriceLevel,
 ): Promise<StockItem[]> {
-  ensureMoySkladToken();
+  ensureMoySkladCredentials();
 
   try {
     console.log(
@@ -397,7 +392,7 @@ export function getOrderNotificationEmail(): string {
 }
 
 export async function submitSalesOrder(payload: OrderPayload): Promise<void> {
-  ensureMoySkladToken();
+  ensureMoySkladCredentials();
   const notificationEmail = getOrderNotificationEmail();
 
   if (!payload.lines.length) {
