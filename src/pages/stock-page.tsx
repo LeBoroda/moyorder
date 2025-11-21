@@ -123,10 +123,10 @@ export default function StockPage() {
         <form className="card" onSubmit={handleSubmit} aria-label="Order form">
           <div className="stock-table" role="table">
             <div className="stock-row stock-row--head" role="row">
-              <span role="columnheader">Name</span>
-              <span role="columnheader">Available</span>
-              <span role="columnheader">Price, ₽</span>
-              <span role="columnheader">Quantity</span>
+              <span role="columnheader">Наименование</span>
+              <span role="columnheader">Доступно</span>
+              <span role="columnheader">Цена, ₽</span>
+              <span role="columnheader">Количество в заказе</span>
             </div>
 
             {availableStock.map((item) => (
@@ -178,7 +178,7 @@ export default function StockPage() {
           )}
 
           <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Sending…" : "Send order"}
+            {isSubmitting ? "Отправка…" : "Заказ отправлен"}
           </button>
         </form>
       )}
