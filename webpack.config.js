@@ -32,6 +32,11 @@ export default {
   plugins: [
     new HtmlWebpackPlugin({
       template: "index.html",
+      filename: "index.html",
+    }),
+    new HtmlWebpackPlugin({
+      template: "index.html",
+      filename: "404.html",
     }),
     new Dotenv({
       systemvars: true,
@@ -65,6 +70,7 @@ export default {
     },
     compress: true,
     port: 9000,
+    historyApiFallback: true,
     proxy: [
       {
         context: ["/api/moysklad"],
