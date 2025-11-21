@@ -1,4 +1,5 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import CopyWebpackPlugin from "copy-webpack-plugin";
 import path from "path";
 import Dotenv from "dotenv-webpack";
 import webpack from "webpack";
@@ -33,10 +34,20 @@ export default {
     new HtmlWebpackPlugin({
       template: "index.html",
       filename: "index.html",
+      favicon: "img/beer-box.png",
     }),
     new HtmlWebpackPlugin({
       template: "index.html",
       filename: "404.html",
+      favicon: "img/beer-box.png",
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: "img",
+          to: "img",
+        },
+      ],
     }),
     new Dotenv({
       systemvars: true,
@@ -65,9 +76,16 @@ export default {
     }),
   ],
   devServer: {
-    static: {
-      directory: path.join(process.cwd(), "public"),
-    },
+    static: [
+      {
+        directory: path.join(process.cwd(), "public"),
+        publicPath: "/",
+      },
+      {
+        directory: path.join(process.cwd(), "img"),
+        publicPath: "/img",
+      },
+    ],
     compress: true,
     port: 9000,
     historyApiFallback: true,
