@@ -1,7 +1,7 @@
-import { stockModel } from "../models/stockModel";
-import { fetchAvailableStock } from "../services/moySkladClient";
+import { stockModel } from "../models/stock-model";
+import { fetchAvailableStock } from "../services/moysklad-client";
 import type { PriceLevel } from "../types/pricing";
-import { eventBus } from "../events/eventBus";
+import { eventBus } from "../events/event-bus";
 import { AppEvents } from "../events/events";
 
 class StockController {

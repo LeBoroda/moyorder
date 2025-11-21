@@ -1,6 +1,6 @@
-import { authModel } from "../models/authModel";
+import { authModel } from "../models/auth-model";
 import { AppEvents } from "../events/events";
-import { eventBus } from "../events/eventBus";
+import { eventBus } from "../events/event-bus";
 
 class AuthController {
   login = (email: string) => {

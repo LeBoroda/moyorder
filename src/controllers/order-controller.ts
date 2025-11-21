@@ -1,12 +1,12 @@
 import { AppEvents } from "../events/events";
-import { eventBus } from "../events/eventBus";
-import { addOrder } from "../services/orderHistory";
+import { eventBus } from "../events/event-bus";
+import { addOrder } from "../services/order-history";
 import {
   getOrderNotificationEmail,
   type StockItem,
   type OrderPayload,
-} from "../services/moySkladClient";
-import { sendEmail, formatOrderEmail } from "../services/emailService";
+} from "../services/moysklad-client";
+import { sendEmail, formatOrderEmail } from "../services/email-service";
 
 interface SubmitParams {
   customerEmail: string;

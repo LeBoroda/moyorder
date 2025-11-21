@@ -1,6 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
-import { stockController } from "../controllers/stockController";
-import { stockModel } from "../models/stockModel";
+import { stockController } from "../controllers/stock-controller";
+import { stockModel } from "../models/stock-model";
 import type { PriceLevel } from "../types/pricing";
 
 export function useStockQuery(priceLevel: PriceLevel) {

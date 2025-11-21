@@ -1,4 +1,4 @@
-import type { StockItem } from "../services/moySkladClient";
+import type { StockItem } from "../services/moysklad-client";
 import type { PriceLevel } from "../types/pricing";
 
 type Listener = () => void;

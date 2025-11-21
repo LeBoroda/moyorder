@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { orderController } from "../controllers/orderController";
-import { useAuth } from "../context/AuthContext";
-import { useStockQuery } from "../hooks/useStockQuery";
-import type { StockItem } from "../services/moySkladClient";
+import { orderController } from "../controllers/order-controller";
+import { useAuth } from "../context/auth-context";
+import { useStockQuery } from "../hooks/use-stock-query";
+import type { StockItem } from "../services/moysklad-client";
 import React from "react";
 
 type OrderFormState = Record<string, number>;

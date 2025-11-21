@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { loadOrders, type SavedOrder } from "../services/orderHistory";
+import { useAuth } from "../context/auth-context";
+import { loadOrders, type SavedOrder } from "../services/order-history";
 import React from "react";
 
 export default function OrderHistoryPage() {

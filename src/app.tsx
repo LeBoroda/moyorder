@@ -1,11 +1,11 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
-import "./App.css";
-import AppLayout from "./components/AppLayout";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import AboutPage from "./pages/AboutPage";
-import LoginPage from "./pages/LoginPage";
-import OrderHistoryPage from "./pages/OrderHistoryPage";
-import StockPage from "./pages/StockPage";
+import "./app.css";
+import AppLayout from "./components/app-layout";
+import { AuthProvider, useAuth } from "./context/auth-context";
+import AboutPage from "./pages/about-page";
+import LoginPage from "./pages/login-page";
+import OrderHistoryPage from "./pages/order-history-page";
+import StockPage from "./pages/stock-page";
 import React from "react";
 
 function RequireAuth() {

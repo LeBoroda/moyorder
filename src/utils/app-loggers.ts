@@ -1,4 +1,4 @@
-import { eventBus } from "../events/eventBus";
+import { eventBus } from "../events/event-bus";
 import { AppEvents } from "../events/events";
 
 eventBus.on(AppEvents.AuthLogin, (user) => {
