@@ -178,7 +178,7 @@ export default function StockPage() {
           )}
 
           <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Отправка…" : "Заказ отправлен"}
+            {isSubmitting ? "Отправка…" : "Отправить заказ"}
           </button>
         </form>
       )}
