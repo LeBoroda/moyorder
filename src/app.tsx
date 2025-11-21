@@ -4,6 +4,7 @@ import AppLayout from "./components/app-layout";
 import { AuthProvider, useAuth } from "./context/auth-context";
 import AboutPage from "./pages/about-page";
 import LoginPage from "./pages/login-page";
+import OrderDetailPage from "./pages/order-detail-page";
 import OrderHistoryPage from "./pages/order-history-page";
 import StockPage from "./pages/stock-page";
 import React from "react";
@@ -27,6 +28,7 @@ function AppRoutes() {
         <Route element={<RequireAuth />}>
           <Route path="/stock" element={<StockPage />} />
           <Route path="/history" element={<OrderHistoryPage />} />
+          <Route path="/history/:orderId" element={<OrderDetailPage />} />
           <Route path="/about" element={<AboutPage />} />
         </Route>
         <Route path="*" element={<Navigate to={defaultPath} replace />} />
