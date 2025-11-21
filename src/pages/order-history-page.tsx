@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/auth-context";
 import { loadOrders, type SavedOrder } from "../services/order-history";
 import React from "react";
@@ -35,7 +36,11 @@ export default function OrderHistoryPage() {
           {orders.map((order) => (
             <article key={order.id} className="card history-card">
               <header>
-                <h3>{new Date(order.createdAt).toLocaleString()}</h3>
+                <h3>
+                  <Link to={`/history/${order.id}`} className="order-link">
+                    {new Date(order.createdAt).toLocaleString()}
+                  </Link>
+                </h3>
                 <p>{order.customerEmail}</p>
               </header>
               <ul>
@@ -50,6 +55,11 @@ export default function OrderHistoryPage() {
               {order.comment && (
                 <p className="history-comment">{order.comment}</p>
               )}
+              <div className="order-actions">
+                <Link to={`/history/${order.id}`} className="view-details-link">
+                  Подробнее →
+                </Link>
+              </div>
             </article>
           ))}
         </div>

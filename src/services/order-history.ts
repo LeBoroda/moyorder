@@ -69,6 +69,14 @@ export function addOrder(
   return newEntry;
 }
 
+export function getOrderById(
+  email: string,
+  orderId: string,
+): SavedOrder | null {
+  const orders = loadOrders(email);
+  return orders.find((order) => order.id === orderId) ?? null;
+}
+
 export function clearOrders(email?: string) {
   if (!email) {
     window.localStorage.removeItem(STORAGE_KEY);
