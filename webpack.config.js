@@ -47,6 +47,16 @@ export default {
           from: "img",
           to: "img",
         },
+        {
+          from: ".nojekyll",
+          to: ".nojekyll",
+          noErrorOnMissing: true,
+        },
+        {
+          from: "public",
+          to: ".",
+          noErrorOnMissing: true,
+        },
       ],
     }),
     new Dotenv({
