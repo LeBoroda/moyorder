@@ -19,6 +19,15 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build --if-present
+        env:
+          NODE_ENV: production
+          MOYSKLAD_USERNAME: ${{ secrets.MOYSKLAD_USERNAME }}
+          MOYSKLAD_PASSWORD: ${{ secrets.MOYSKLAD_PASSWORD }}
+          MOYSKLAD_TOKEN: ${{ secrets.MOYSKLAD_TOKEN }}
+          ORDER_NOTIFICATION_EMAIL: ${{ secrets.ORDER_NOTIFICATION_EMAIL }}
+          EMAILJS_PUBLIC_KEY: ${{ secrets.EMAILJS_PUBLIC_KEY }}
+          EMAILJS_SERVICE_ID: ${{ secrets.EMAILJS_SERVICE_ID }}
+          EMAILJS_TEMPLATE_ID: ${{ secrets.EMAILJS_TEMPLATE_ID }}
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
