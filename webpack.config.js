@@ -48,17 +48,27 @@ export default {
           to: "img",
         },
         {
-          from: ".nojekyll",
-          to: ".nojekyll",
-          noErrorOnMissing: true,
-        },
-        {
           from: "public",
           to: ".",
           noErrorOnMissing: true,
         },
       ],
     }),
+    // Create .nojekyll file for GitHub Pages
+    new (class {
+      apply(compiler) {
+        compiler.hooks.emit.tapAsync(
+          "CreateNoJekyll",
+          (compilation, callback) => {
+            compilation.assets[".nojekyll"] = {
+              source: () => "",
+              size: () => 0,
+            };
+            callback();
+          },
+        );
+      }
+    })(),
     new Dotenv({
       systemvars: true,
     }),
