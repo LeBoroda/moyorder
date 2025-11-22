@@ -37,4 +37,11 @@ export default defineConfig([
   {
     ignores: ["package.json", "package-lock.json"],
   },
+  {
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
 ]);
