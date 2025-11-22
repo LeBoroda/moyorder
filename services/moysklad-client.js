@@ -58,46 +58,51 @@ function moySkladRequest(endpoint_1) {
         }
         try {
             const response = yield fetch(url, Object.assign(Object.assign({}, options), { headers: Object.assign({ Authorization: `Basic ${basicAuth}`, "Content-Type": "application/json", Accept: "application/json;charset=utf-8" }, options.headers) }));
-            if (!response.ok) {
-                let errorMessage = `MoySklad API error: ${response.status} ${response.statusText}`;
-                // Clone response to read error details without consuming the original
-                const responseClone = response.clone();
-                // Read error body as text first, then try to parse as JSON
-                let errorBodyText = "";
+            // Read response body once and store it
+            let responseBodyText = "";
+            let responseBodyJson = null;
+            try {
+                responseBodyText = yield response.text();
+                // Try to parse as JSON
                 try {
-                    errorBodyText = yield responseClone.text();
+                    responseBodyJson = JSON.parse(responseBodyText);
                 }
                 catch (_a) {
-                    // If reading fails, use empty string
-                    errorBodyText = "";
+                    // Not JSON, keep as text
                 }
+            }
+            catch (error) {
+                // If reading fails, we'll handle it below
+                if (process.env.NODE_ENV === "development") {
+                    console.error("[DEBUG] Failed to read response body:", error);
+                }
+            }
+            if (!response.ok) {
+                let errorMessage = `MoySklad API error: ${response.status} ${response.statusText}`;
                 if (response.status === 401) {
                     let authErrorDetails = "";
-                    if (errorBodyText) {
-                        try {
-                            const errorData = JSON.parse(errorBodyText);
-                            if (process.env.NODE_ENV === "development") {
-                                console.error("[DEBUG] 401 Error Response:", JSON.stringify(errorData, null, 2));
-                            }
-                            if (errorData.errors && Array.isArray(errorData.errors)) {
-                                authErrorDetails = errorData.errors
-                                    .map((e) => {
-                                    if (typeof e === "object" && e !== null) {
-                                        const err = e;
-                                        return err.error || err.message || JSON.stringify(e);
-                                    }
-                                    return String(e);
-                                })
-                                    .join(", ");
-                            }
+                    if (responseBodyJson && typeof responseBodyJson === "object") {
+                        const errorData = responseBodyJson;
+                        if (process.env.NODE_ENV === "development") {
+                            console.error("[DEBUG] 401 Error Response:", JSON.stringify(errorData, null, 2));
                         }
-                        catch (_b) {
-                            // If JSON parsing fails, use text as is
-                            if (process.env.NODE_ENV === "development") {
-                                console.error("[DEBUG] 401 Error Text:", errorBodyText);
-                            }
-                            authErrorDetails = errorBodyText;
+                        if (errorData.errors && Array.isArray(errorData.errors)) {
+                            authErrorDetails = errorData.errors
+                                .map((e) => {
+                                if (typeof e === "object" && e !== null) {
+                                    const err = e;
+                                    return err.error || err.message || JSON.stringify(e);
+                                }
+                                return String(e);
+                            })
+                                .join(", ");
                         }
+                    }
+                    else if (responseBodyText) {
+                        if (process.env.NODE_ENV === "development") {
+                            console.error("[DEBUG] 401 Error Text:", responseBodyText);
+                        }
+                        authErrorDetails = responseBodyText;
                     }
                     let authError = "MoySklad authentication failed. ";
                     if (authErrorDetails) {
@@ -109,40 +114,50 @@ function moySkladRequest(endpoint_1) {
                 if (response.status === 429) {
                     throw new Error("MoySklad API rate limit exceeded. Please try again later.");
                 }
-                // For other errors, try to parse error details from text
-                if (errorBodyText) {
-                    try {
-                        const errorData = JSON.parse(errorBodyText);
-                        if (errorData.errors && Array.isArray(errorData.errors)) {
-                            const errorDetails = errorData.errors
-                                .map((e) => {
-                                if (typeof e === "object" && e !== null) {
-                                    const err = e;
-                                    return err.error || err.message || JSON.stringify(e);
-                                }
-                                return String(e);
-                            })
-                                .join(", ");
-                            errorMessage += `. ${errorDetails}`;
-                        }
-                        else if (errorData.error) {
-                            errorMessage += `. ${errorData.error}`;
-                        }
-                        if (process.env.NODE_ENV === "development") {
-                            console.error("[DEBUG] API Error Response:", errorData);
-                        }
+                // For other errors, try to parse error details
+                if (responseBodyJson && typeof responseBodyJson === "object") {
+                    const errorData = responseBodyJson;
+                    if (errorData.errors && Array.isArray(errorData.errors)) {
+                        const errorDetails = errorData.errors
+                            .map((e) => {
+                            if (typeof e === "object" && e !== null) {
+                                const err = e;
+                                return err.error || err.message || JSON.stringify(e);
+                            }
+                            return String(e);
+                        })
+                            .join(", ");
+                        errorMessage += `. ${errorDetails}`;
                     }
-                    catch (_c) {
-                        // If JSON parsing fails, use text as is
-                        errorMessage += `. ${errorBodyText}`;
-                        if (process.env.NODE_ENV === "development") {
-                            console.error("[DEBUG] API Error Text:", errorBodyText);
-                        }
+                    else if (errorData.error) {
+                        errorMessage += `. ${errorData.error}`;
+                    }
+                    if (process.env.NODE_ENV === "development") {
+                        console.error("[DEBUG] API Error Response:", errorData);
+                    }
+                }
+                else if (responseBodyText) {
+                    errorMessage += `. ${responseBodyText}`;
+                    if (process.env.NODE_ENV === "development") {
+                        console.error("[DEBUG] API Error Text:", responseBodyText);
                     }
                 }
                 throw new Error(errorMessage);
             }
-            return response.json();
+            // For successful responses, return parsed JSON
+            if (responseBodyJson !== null) {
+                return responseBodyJson;
+            }
+            // If not JSON, try to parse from text
+            if (responseBodyText) {
+                try {
+                    return JSON.parse(responseBodyText);
+                }
+                catch (_b) {
+                    throw new Error("Response is not valid JSON");
+                }
+            }
+            throw new Error("Empty response body");
         }
         catch (error) {
             if (error instanceof Error) {
