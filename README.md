@@ -64,6 +64,7 @@ cp .env.example .env  # если есть пример
 # Учетные данные МойСклад
 MOYSKLAD_USERNAME=your_username          # Имя пользователя МойСклад (опционально)
 MOYSKLAD_PASSWORD=your_password          # Пароль или токен API МойСклад (обязательно)
+MOYSKLAD_CORS_PROXY=https://your-cors-proxy.com  # CORS proxy для production (опционально, но рекомендуется для GitHub Pages)
 
 # Email для уведомлений о заказах
 ORDER_NOTIFICATION_EMAIL=notifications@example.com
@@ -144,6 +145,7 @@ const PRICE_LEVEL_BY_EMAIL: Record<string, PriceLevel> = {
    - `MOYSKLAD_USERNAME` - имя пользователя МойСклад (опционально)
    - `MOYSKLAD_PASSWORD` - пароль или токен API МойСклад (обязательно)
    - `MOYSKLAD_TOKEN` - токен API МойСклад (опционально, альтернатива паролю)
+   - `MOYSKLAD_CORS_PROXY` - URL CORS proxy для обхода ограничений CORS в production (опционально, но **рекомендуется** для GitHub Pages)
    - `ORDER_NOTIFICATION_EMAIL` - email для уведомлений о заказах
    - `EMAILJS_PUBLIC_KEY` - публичный ключ EmailJS
    - `EMAILJS_SERVICE_ID` - ID сервиса EmailJS

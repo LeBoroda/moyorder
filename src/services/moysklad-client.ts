@@ -62,11 +62,27 @@ interface MoySkladResponse<T> {
 // Actual MoySklad API base URL (used in meta.href for order payloads)
 const MOYSKLAD_API_BASE_ACTUAL = "https://api.moysklad.ru/api/remap/1.2";
 
-// Use proxy in development to avoid CORS issues, direct API in production
-const MOYSKLAD_API_BASE =
-  process.env.NODE_ENV === "development"
-    ? "/api/moysklad"
-    : MOYSKLAD_API_BASE_ACTUAL;
+// Use proxy in development to avoid CORS issues
+// In production, use CORS proxy if MOYSKLAD_CORS_PROXY is set, otherwise try direct API
+function getMoySkladApiBase(): string {
+  if (process.env.NODE_ENV === "development") {
+    return "/api/moysklad";
+  }
+
+  // Check if CORS proxy is configured
+  const corsProxy = readEnv("MOYSKLAD_CORS_PROXY");
+  if (corsProxy) {
+    // Remove trailing slash if present
+    // The proxy will receive paths like /api/remap/1.2/entity/product
+    // and will forward them to https://api.moysklad.ru/api/remap/1.2/entity/product
+    return corsProxy.endsWith("/") ? corsProxy.slice(0, -1) : corsProxy;
+  }
+
+  // Try direct API (may fail due to CORS)
+  return MOYSKLAD_API_BASE_ACTUAL;
+}
+
+const MOYSKLAD_API_BASE = getMoySkladApiBase();
 
 function ensureMoySkladCredentials(): { username: string; password: string } {
   const username = readEnv("MOYSKLAD_USERNAME") || "";

@@ -81,6 +81,9 @@ export default {
         process.env.MOYSKLAD_PASSWORD,
       ),
       "process.env.MOYSKLAD_TOKEN": JSON.stringify(process.env.MOYSKLAD_TOKEN),
+      "process.env.MOYSKLAD_CORS_PROXY": JSON.stringify(
+        process.env.MOYSKLAD_CORS_PROXY,
+      ),
       "process.env.ORDER_NOTIFICATION_EMAIL": JSON.stringify(
         process.env.ORDER_NOTIFICATION_EMAIL,
       ),
