@@ -134,40 +134,54 @@ async function moySkladRequest<T>(
     if (!response.ok) {
       let errorMessage = `MoySklad API error: ${response.status} ${response.statusText}`;
 
+      // Clone response to read error details without consuming the original
+      const responseClone = response.clone();
+
+      // Read error body as text first, then try to parse as JSON
+      let errorBodyText = "";
+      try {
+        errorBodyText = await responseClone.text();
+      } catch {
+        // If reading fails, use empty string
+        errorBodyText = "";
+      }
+
       if (response.status === 401) {
         let authErrorDetails = "";
-        try {
-          const errorData = await response.clone().json();
-          if (process.env.NODE_ENV === "development") {
-            console.error(
-              "[DEBUG] 401 Error Response:",
-              JSON.stringify(errorData, null, 2),
-            );
+        if (errorBodyText) {
+          try {
+            const errorData = JSON.parse(errorBodyText);
+            if (process.env.NODE_ENV === "development") {
+              console.error(
+                "[DEBUG] 401 Error Response:",
+                JSON.stringify(errorData, null, 2),
+              );
+            }
+            if (errorData.errors && Array.isArray(errorData.errors)) {
+              authErrorDetails = errorData.errors
+                .map((e: unknown) => {
+                  if (typeof e === "object" && e !== null) {
+                    const err = e as { error?: string; message?: string };
+                    return err.error || err.message || JSON.stringify(e);
+                  }
+                  return String(e);
+                })
+                .join(", ");
+            }
+          } catch {
+            // If JSON parsing fails, use text as is
+            if (process.env.NODE_ENV === "development") {
+              console.error("[DEBUG] 401 Error Text:", errorBodyText);
+            }
+            authErrorDetails = errorBodyText;
           }
-          if (errorData.errors && Array.isArray(errorData.errors)) {
-            authErrorDetails = errorData.errors
-              .map((e: unknown) => {
-                if (typeof e === "object" && e !== null) {
-                  const err = e as { error?: string; message?: string };
-                  return err.error || err.message || JSON.stringify(e);
-                }
-                return String(e);
-              })
-              .join(", ");
-          }
-        } catch {
-          const errorText = await response.clone().text();
-          if (process.env.NODE_ENV === "development") {
-            console.error("[DEBUG] 401 Error Text:", errorText);
-          }
-          authErrorDetails = errorText;
         }
 
         let authError = "MoySklad authentication failed. ";
         if (authErrorDetails) {
           authError += `Details: ${authErrorDetails}. `;
         }
-        authError += "Please verify your VITE_MOYSKLAD_TOKEN and .env setup.";
+        authError += "Please verify your MOYSKLAD_PASSWORD and .env setup.";
         throw new Error(authError);
       }
 
@@ -177,32 +191,33 @@ async function moySkladRequest<T>(
         );
       }
 
-      try {
-        const errorData = await response.json();
-        if (errorData.errors && Array.isArray(errorData.errors)) {
-          const errorDetails = errorData.errors
-            .map((e: unknown) => {
-              if (typeof e === "object" && e !== null) {
-                const err = e as { error?: string; message?: string };
-                return err.error || err.message || JSON.stringify(e);
-              }
-              return String(e);
-            })
-            .join(", ");
-          errorMessage += `. ${errorDetails}`;
-        } else if (errorData.error) {
-          errorMessage += `. ${errorData.error}`;
-        }
-        if (process.env.NODE_ENV === "development") {
-          console.error("[DEBUG] API Error Response:", errorData);
-        }
-      } catch {
-        const errorText = await response.text();
-        if (errorText) {
-          errorMessage += `. ${errorText}`;
-        }
-        if (process.env.NODE_ENV === "development") {
-          console.error("[DEBUG] API Error Text:", errorText);
+      // For other errors, try to parse error details from text
+      if (errorBodyText) {
+        try {
+          const errorData = JSON.parse(errorBodyText);
+          if (errorData.errors && Array.isArray(errorData.errors)) {
+            const errorDetails = errorData.errors
+              .map((e: unknown) => {
+                if (typeof e === "object" && e !== null) {
+                  const err = e as { error?: string; message?: string };
+                  return err.error || err.message || JSON.stringify(e);
+                }
+                return String(e);
+              })
+              .join(", ");
+            errorMessage += `. ${errorDetails}`;
+          } else if (errorData.error) {
+            errorMessage += `. ${errorData.error}`;
+          }
+          if (process.env.NODE_ENV === "development") {
+            console.error("[DEBUG] API Error Response:", errorData);
+          }
+        } catch {
+          // If JSON parsing fails, use text as is
+          errorMessage += `. ${errorBodyText}`;
+          if (process.env.NODE_ENV === "development") {
+            console.error("[DEBUG] API Error Text:", errorBodyText);
+          }
         }
       }
       throw new Error(errorMessage);
