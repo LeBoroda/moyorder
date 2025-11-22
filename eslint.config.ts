@@ -35,7 +35,13 @@ export default defineConfig([
     extends: ["css/recommended"],
   },
   {
-    ignores: ["package.json", "package-lock.json"],
+    ignores: [
+      "package.json",
+      "package-lock.json",
+      "coverage/**",
+      "dist/**",
+      "build/**",
+    ],
   },
   {
     languageOptions: {
