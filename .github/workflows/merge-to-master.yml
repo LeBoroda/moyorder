@@ -24,6 +24,7 @@ jobs:
           MOYSKLAD_USERNAME: ${{ secrets.MOYSKLAD_USERNAME }}
           MOYSKLAD_PASSWORD: ${{ secrets.MOYSKLAD_PASSWORD }}
           MOYSKLAD_TOKEN: ${{ secrets.MOYSKLAD_TOKEN }}
+          MOYSKLAD_CORS_PROXY: ${{ secrets.MOYSKLAD_CORS_PROXY }}
           ORDER_NOTIFICATION_EMAIL: ${{ secrets.ORDER_NOTIFICATION_EMAIL }}
           EMAILJS_PUBLIC_KEY: ${{ secrets.EMAILJS_PUBLIC_KEY }}
           EMAILJS_SERVICE_ID: ${{ secrets.EMAILJS_SERVICE_ID }}
