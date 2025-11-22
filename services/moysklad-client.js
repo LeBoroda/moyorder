@@ -60,15 +60,61 @@ function moySkladRequest(endpoint_1) {
             const response = yield fetch(url, Object.assign(Object.assign({}, options), { headers: Object.assign({ Authorization: `Basic ${basicAuth}`, "Content-Type": "application/json", Accept: "application/json;charset=utf-8" }, options.headers) }));
             if (!response.ok) {
                 let errorMessage = `MoySklad API error: ${response.status} ${response.statusText}`;
+                // Clone response to read error details without consuming the original
+                const responseClone = response.clone();
+                // Read error body as text first, then try to parse as JSON
+                let errorBodyText = "";
+                try {
+                    errorBodyText = yield responseClone.text();
+                }
+                catch (_a) {
+                    // If reading fails, use empty string
+                    errorBodyText = "";
+                }
                 if (response.status === 401) {
                     let authErrorDetails = "";
-                    try {
-                        const errorData = yield response.clone().json();
-                        if (process.env.NODE_ENV === "development") {
-                            console.error("[DEBUG] 401 Error Response:", JSON.stringify(errorData, null, 2));
+                    if (errorBodyText) {
+                        try {
+                            const errorData = JSON.parse(errorBodyText);
+                            if (process.env.NODE_ENV === "development") {
+                                console.error("[DEBUG] 401 Error Response:", JSON.stringify(errorData, null, 2));
+                            }
+                            if (errorData.errors && Array.isArray(errorData.errors)) {
+                                authErrorDetails = errorData.errors
+                                    .map((e) => {
+                                    if (typeof e === "object" && e !== null) {
+                                        const err = e;
+                                        return err.error || err.message || JSON.stringify(e);
+                                    }
+                                    return String(e);
+                                })
+                                    .join(", ");
+                            }
                         }
+                        catch (_b) {
+                            // If JSON parsing fails, use text as is
+                            if (process.env.NODE_ENV === "development") {
+                                console.error("[DEBUG] 401 Error Text:", errorBodyText);
+                            }
+                            authErrorDetails = errorBodyText;
+                        }
+                    }
+                    let authError = "MoySklad authentication failed. ";
+                    if (authErrorDetails) {
+                        authError += `Details: ${authErrorDetails}. `;
+                    }
+                    authError += "Please verify your MOYSKLAD_PASSWORD and .env setup.";
+                    throw new Error(authError);
+                }
+                if (response.status === 429) {
+                    throw new Error("MoySklad API rate limit exceeded. Please try again later.");
+                }
+                // For other errors, try to parse error details from text
+                if (errorBodyText) {
+                    try {
+                        const errorData = JSON.parse(errorBodyText);
                         if (errorData.errors && Array.isArray(errorData.errors)) {
-                            authErrorDetails = errorData.errors
+                            const errorDetails = errorData.errors
                                 .map((e) => {
                                 if (typeof e === "object" && e !== null) {
                                     const err = e;
@@ -77,53 +123,21 @@ function moySkladRequest(endpoint_1) {
                                 return String(e);
                             })
                                 .join(", ");
+                            errorMessage += `. ${errorDetails}`;
                         }
-                    }
-                    catch (_a) {
-                        const errorText = yield response.clone().text();
+                        else if (errorData.error) {
+                            errorMessage += `. ${errorData.error}`;
+                        }
                         if (process.env.NODE_ENV === "development") {
-                            console.error("[DEBUG] 401 Error Text:", errorText);
+                            console.error("[DEBUG] API Error Response:", errorData);
                         }
-                        authErrorDetails = errorText;
                     }
-                    let authError = "MoySklad authentication failed. ";
-                    if (authErrorDetails) {
-                        authError += `Details: ${authErrorDetails}. `;
-                    }
-                    authError += "Please verify your VITE_MOYSKLAD_TOKEN and .env setup.";
-                    throw new Error(authError);
-                }
-                if (response.status === 429) {
-                    throw new Error("MoySklad API rate limit exceeded. Please try again later.");
-                }
-                try {
-                    const errorData = yield response.json();
-                    if (errorData.errors && Array.isArray(errorData.errors)) {
-                        const errorDetails = errorData.errors
-                            .map((e) => {
-                            if (typeof e === "object" && e !== null) {
-                                const err = e;
-                                return err.error || err.message || JSON.stringify(e);
-                            }
-                            return String(e);
-                        })
-                            .join(", ");
-                        errorMessage += `. ${errorDetails}`;
-                    }
-                    else if (errorData.error) {
-                        errorMessage += `. ${errorData.error}`;
-                    }
-                    if (process.env.NODE_ENV === "development") {
-                        console.error("[DEBUG] API Error Response:", errorData);
-                    }
-                }
-                catch (_b) {
-                    const errorText = yield response.text();
-                    if (errorText) {
-                        errorMessage += `. ${errorText}`;
-                    }
-                    if (process.env.NODE_ENV === "development") {
-                        console.error("[DEBUG] API Error Text:", errorText);
+                    catch (_c) {
+                        // If JSON parsing fails, use text as is
+                        errorMessage += `. ${errorBodyText}`;
+                        if (process.env.NODE_ENV === "development") {
+                            console.error("[DEBUG] API Error Text:", errorBodyText);
+                        }
                     }
                 }
                 throw new Error(errorMessage);
