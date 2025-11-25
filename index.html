@@ -12,14 +12,14 @@
       (function () {
         var pathSegmentsToKeep = 0; // Set to 1 if your repo name is in the URL path
         var l = window.location;
-        if (l.search[1] === "/") {
+        if (l.search[1] === '/') {
           var decoded = l.search
             .slice(1)
-            .split("&")
+            .split('&')
             .map(function (s) {
-              return s.replace(/~and~/g, "&");
+              return s.replace(/~and~/g, '&');
             })
-            .join("?");
+            .join('?');
           window.history.replaceState(
             null,
             null,
