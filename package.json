@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "prettier --check . && eslint .",
+    "lint:fix": "prettier --write . && eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -28,9 +30,13 @@
     "@types/jest": "^30.0.0",
     "babel-jest": "^30.2.0",
     "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.5.0",
     "jest": "^30.2.0",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
     "typescript-eslint": "^8.48.0"
   }
 }
