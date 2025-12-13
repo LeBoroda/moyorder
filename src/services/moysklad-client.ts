@@ -88,14 +88,20 @@ function ensureMoySkladCredentials(): { username: string; password: string } {
   const username = readEnv("MOYSKLAD_USERNAME") || "";
   const password = readEnv("MOYSKLAD_PASSWORD");
 
-  if (!password) {
+  // Trim whitespace from credentials
+  const cleanPassword = password?.trim();
+  const cleanUsername = username?.trim() || "";
+
+  if (!cleanPassword) {
     const errorMsg =
       "Missing MoySklad credentials. Please set MOYSKLAD_PASSWORD in environment variables.";
     console.error(errorMsg);
     throw new Error(errorMsg);
   }
 
-  return { username, password };
+  // MoySklad API authentication using username and password
+  // Format: username:password (username can be empty)
+  return { username: cleanUsername, password: cleanPassword };
 }
 
 async function moySkladRequest<T>(
@@ -105,30 +111,46 @@ async function moySkladRequest<T>(
   const { username, password } = ensureMoySkladCredentials();
   const url = `${MOYSKLAD_API_BASE}${endpoint}`;
 
-  const basicAuth = username
-    ? btoa(`${username}:${password}`)
-    : btoa(`:${password}`);
+  // Build Basic Auth string: username:password
+  const authString = `${username}:${password}`;
+  const basicAuth = btoa(authString);
 
   if (process.env.NODE_ENV === "development") {
     console.log(`[DEBUG] Making request to: ${url} (via proxy)`);
     console.log(`[DEBUG] Using Basic auth authentication`);
     console.log(
-      `[DEBUG] Username: ${username || "(empty)"}, Password: ${password.substring(0, 8)}...${password.substring(password.length - 4)}`,
+      `[DEBUG] Username: ${username || "(empty)"}, Password: ${password ? `${password.substring(0, 8)}...${password.substring(password.length - 4)}` : "(empty)"}`,
     );
     console.log(
-      `[DEBUG] Basic Auth string: ${username ? `${username}:${password.substring(0, 8)}...` : `:${password.substring(0, 8)}...`}`,
+      `[DEBUG] Basic Auth string format: ${username || "(empty)"}:${password || "(empty)"}`,
     );
+    console.log(
+      `[DEBUG] Basic Auth encoded length: ${basicAuth.length} characters`,
+    );
+  }
+
+  // Prepare headers
+  const headers: HeadersInit = {
+    Authorization: `Basic ${basicAuth}`,
+    "Content-Type": "application/json",
+    Accept: "application/json;charset=utf-8",
+    ...options.headers,
+  };
+
+  if (process.env.NODE_ENV === "development") {
+    const hasAuth =
+      typeof headers === "object" &&
+      !Array.isArray(headers) &&
+      "Authorization" in headers;
+    console.log(`[DEBUG] Request headers include Authorization: ${hasAuth}`);
   }
 
   try {
     const response = await fetch(url, {
       ...options,
-      headers: {
-        Authorization: `Basic ${basicAuth}`,
-        "Content-Type": "application/json",
-        Accept: "application/json;charset=utf-8",
-        ...options.headers,
-      },
+      headers,
+      // Prevent browser from showing auth dialog
+      credentials: "omit",
     });
 
     // Read response body once and store it
@@ -187,7 +209,8 @@ async function moySkladRequest<T>(
         if (authErrorDetails) {
           authError += `Details: ${authErrorDetails}. `;
         }
-        authError += "Please verify your MOYSKLAD_PASSWORD and .env setup.";
+        authError +=
+          "Please verify your MOYSKLAD_USERNAME and MOYSKLAD_PASSWORD and .env setup.";
         throw new Error(authError);
       }
 

@@ -20,6 +20,7 @@ function resolvePriceLevel(email: string): PriceLevel | null {
 }
 
 function hasCredentials() {
+  // Check for password
   return Boolean(readEnv("MOYSKLAD_PASSWORD"));
 }
 

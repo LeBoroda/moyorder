@@ -5,7 +5,6 @@ import Dotenv from "dotenv-webpack";
 import webpack from "webpack";
 import { config } from "dotenv";
 
-// Load .env file to get values for DefinePlugin
 config();
 
 export default {
@@ -74,13 +73,15 @@ export default {
     }),
     // Explicitly define environment variables for dynamic access
     new webpack.DefinePlugin({
+      "process.env.NODE_ENV": JSON.stringify(
+        process.env.NODE_ENV || "development",
+      ),
       "process.env.MOYSKLAD_USERNAME": JSON.stringify(
         process.env.MOYSKLAD_USERNAME,
       ),
       "process.env.MOYSKLAD_PASSWORD": JSON.stringify(
         process.env.MOYSKLAD_PASSWORD,
       ),
-      "process.env.MOYSKLAD_TOKEN": JSON.stringify(process.env.MOYSKLAD_TOKEN),
       "process.env.MOYSKLAD_CORS_PROXY": JSON.stringify(
         process.env.MOYSKLAD_CORS_PROXY,
       ),
@@ -121,6 +122,20 @@ export default {
           "^/api/moysklad": "",
         },
         secure: true,
+        // Log proxy requests in development
+        onProxyReq: (proxyReq, req) => {
+          // Log Authorization header status (webpack-dev-server automatically forwards all headers)
+          if (req.headers.authorization) {
+            const authHeader = req.headers.authorization;
+            const isBasic = authHeader.startsWith("Basic ");
+            const preview = authHeader.substring(0, 20) + "...";
+            console.log(
+              `[PROXY] Forwarding request with Authorization header (${isBasic ? "Basic" : "Other"}): ${preview}`,
+            );
+          } else {
+            console.warn("[PROXY] WARNING: No Authorization header in request");
+          }
+        },
       },
     ],
   },
