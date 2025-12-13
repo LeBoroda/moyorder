@@ -15,6 +15,7 @@ function resolvePriceLevel(email) {
     return (_a = PRICE_LEVEL_BY_EMAIL[normalizeEmail(email)]) !== null && _a !== void 0 ? _a : null;
 }
 function hasCredentials() {
+    // Check for password
     return Boolean((0, env_1.readEnv)("MOYSKLAD_PASSWORD"));
 }
 function saveUserToStorage(user) {

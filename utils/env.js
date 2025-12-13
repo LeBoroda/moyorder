@@ -7,8 +7,6 @@ function readEnv(key) {
             return process.env.MOYSKLAD_USERNAME;
         case "MOYSKLAD_PASSWORD":
             return process.env.MOYSKLAD_PASSWORD;
-        case "MOYSKLAD_TOKEN":
-            return process.env.MOYSKLAD_TOKEN;
         case "MOYSKLAD_CORS_PROXY":
             return process.env.MOYSKLAD_CORS_PROXY;
         case "ORDER_NOTIFICATION_EMAIL":
